@@ -1,0 +1,23 @@
+ngx_feature="GraphicsMagick"
+ngx_feature_name=
+ngx_feature_run=no
+ngx_feature_incs="#include <magick/api.h>"
+ngx_feature_path="/usr/include/GraphicsMagick"
+ngx_feature_libs=-lGraphicsMagick
+ngx_feature_test="InitializeMagick(\"\");"
+. auto/feature
+
+if [ $ngx_found = yes ]; then
+    USE_SHA1=YES
+    ngx_addon_name=ngx_http_imaging_module
+    HTTP_MODULES="$HTTP_MODULES ngx_http_imaging_module"
+    NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/src/ngx_http_imaging_module.c $ngx_addon_dir/src/imaging.c"
+    NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/src/imaging.h"
+    CORE_LIBS="$CORE_LIBS `GraphicsMagick-config --libs`"
+    CFLAGS="$CFLAGS `GraphicsMagick-config --cppflags`"
+else
+    cat << END
+$0: error: the Imaging Module requires the GraphicsMagick library.
+END
+    exit 1
+fi

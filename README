@@ -1,0 +1,154 @@
+
+Name
+    ngx_imaging_module - Dynamic image manipulation for arbitrary Nginx locations.
+    
+Status
+    This module is in development. [beta]
+    
+Version
+    0.0.1 - Initial internal release.
+    
+Synopsis
+http {
+    server {    
+        
+        location {
+        
+            error_page 404 = @img;
+            recursive_error_pages on;
+        }
+            
+        location @img {
+            # try to create the image
+            imaging "on";
+            imaging_quality 70;       
+            imaging_salt "Shared secrete hash salt";
+            imaging_white_list "t400 t480"; 
+            imaging_write_to_disk "on";     
+        }
+    }
+}
+    
+Directives
+
+    imaging
+    syntax: imaging on|off
+    default imaging off
+    context: http, server, location
+
+    imaging_salt 
+    syntax: imaging_salt "my salt string";
+    default ""
+    context: http, server, location
+
+    imaging_quality
+    syntax: imaging_quality 70;
+    default 70
+    context: http, server, location
+    
+    imaging_white_list
+    syntax: imaging_white_list "t200 t400 t400x400 r400";
+    default ""
+    context: http, server, location
+    
+    imaging_write_to_disk
+    syntax: imaging_write_to_disk on|off;
+    default on
+    context: http, server, location
+    
+
+Description    
+    ngx_imaging_module is an Nginx extension which allows you to create images 
+    based on modifications to existing images. By delaying the generation of 
+    transformed images until the time of request, your able to 'pay only for 
+    what you eat'.
+
+    Image transformations are encoded into the file name in a 'somewhat' human 
+    readable form, where each transformation is separated by an underscore in the 
+    filename.
+
+    The module uses the GraphicsMagick 'core C API' to perform the various image 
+    transformations. GraphicsMagick is a fork of ImageMagick which leverages
+    OpenMP technologies to squeeze out more performance.
+
+
+Security
+    Shared salt key:
+        - A salt is used in the creation of a hash string which is 
+        passed from the calling application to the server to verify its 
+        authenticity.
+        
+
+Image Transformations
+    ngx_imaging_module currently supports the following transformations.
+    
+    Border
+        Apply a border around an Image. 
+        Examples:
+            b5-black    - 5px Black border
+            b1-red      - 1px Red border
+            
+    Crop
+        Create a new image by cropping of the center of an existing image.
+        Examples:
+            c200
+            c200x200
+            cx200
+    
+    Scale
+        Resize an image ignoring the aspect ratio.
+        Examples:
+            s200
+            s200x200
+            sx200
+        
+    Resize
+        Resize an image preserving the aspect ratio.
+            Examples:
+            r200
+            r200x200
+            rx200
+        
+    Thumbnail
+        Resize an image preserving the aspect ratio.
+        Examples:
+            t200
+            t200x200
+            tx200
+    
+    Note: These transformations can be chained together sperated by underscores.
+    Example:
+        t200_b1-black       - Thumbnail to 200 wide and add a 1px black border.
+        r400x400_c200x200   - Resize to 400x400 then crop 200x200 out of that.
+            
+
+Installation
+    Dependencies:
+        GraphicMagick - Image manipulation library.
+        
+        Can be installed via normal Ubuntu apt-get:
+            dev@box:~$ sudo apt-get install libmagickcore-dev 
+	    # you may have to pull (libgraphicsmagick1-dev libgraphicsmagick3)
+
+        Check that GraphicsMagic-config (build utilty program) is installed.
+            dev@box:~$ GraphicsMagick-config --cppflags --ldflags --libs
+        
+        that should return something like:
+            -I/usr/include/GraphicsMagick
+            -L${exec_prefix}/lib
+            -lGraphicsMagick -llcms -ltiff -lfreetype -ljasper -ljpeg -lpng -lwmflite -lXext -lSM -lICE -lX11 -lbz2 -lxml2 -lz -lm -lgomp -lpthread -lltdl
+            
+        OpenSSH - Contains SHA1 hash algorithm.
+    
+    Install:
+        Download the modules source (either via bzr, or a source tarball).
+        Then compile nginx as you would normally adding the following:
+            --add-module=/path/to/ngx_imaging_module/
+        
+        Nginx will hook the config file located in that directory and use 
+        it to pull in all the source files (as well as config the build).
+    
+Testing:
+    Under /test     
+    
+        

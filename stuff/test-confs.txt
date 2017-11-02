@@ -1,0 +1,14 @@
+#./configure --prefix=/srv/code/nginx/install/ --with-debug --user=kit --group=kit --with-http_ssl_module --with-http_stub_status_module --with-http_gzip_static_module --without-mail_pop3_module --without-mail_imap_module --without-mail_smtp_module --with-http_dav_module --without-http_rewrite_module --add-module=../modules/image_hacker/
+
+
+kit@starbug-lv:/srv/code/nginx/nginx-0.9.5$ MagickWand-config --ldflags --libs
+-L/usr/lib -Wl,-Bsymbolic-functions -L/usr/lib/X11
+-L/usr/lib -lMagickWand -lMagickCore -llcms -ltiff -lfreetype -ljpeg -lXext -lSM -lICE -lX11 -lXt -lbz2 -lz -lm -lgomp -lpthread -lltdl
+
+kit@starbug-lv:/srv/code/nginx/nginx-0.9.5$ MagickWand-config --cflags --cppflags
+-I/usr/include/ImageMagick -fopenmp
+-I/usr/include/ImageMagick
+
+
+
+
